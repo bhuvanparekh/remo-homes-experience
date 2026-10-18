@@ -1,0 +1,252 @@
+/* Palette and font tokens (--c-*, --f-*) are written at boot by applyBrandToCss. */
+:root {
+  --gutter: clamp(16px, 4vw, 48px);
+  --header-h: 68px;
+  --glass: rgba(28, 23, 21, 0.58);
+  --glass-line: rgba(248, 246, 241, 0.14);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--c-ink, #28211e);
+  color: var(--c-cream, #f8f6f1);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--c-gold);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.eyebrow {
+  margin: 0 0 14px;
+  font-family: var(--f-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--c-gold-hover);
+}
+
+.accent {
+  font-family: var(--f-accent);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 24px;
+  border-radius: 999px;
+  font-family: var(--f-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition:
+    background-color 200ms var(--ease-out),
+    color 200ms var(--ease-out),
+    transform 160ms var(--ease-out);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn--gold {
+  background: var(--c-gold);
+  color: var(--c-ink);
+}
+
+.btn--ghost {
+  border: 1px solid var(--glass-line);
+  color: var(--c-cream);
+}
+
+.btn--sm {
+  min-height: 40px;
+  padding: 0 18px;
+  font-size: 12px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn--gold:hover {
+    background: var(--c-gold-hover);
+  }
+  .btn--ghost:hover {
+    background: rgba(248, 246, 241, 0.08);
+  }
+}
+
+/* Header */
+.header {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  height: var(--header-h);
+  padding: 0 var(--gutter);
+  background: linear-gradient(to bottom, rgba(20, 16, 14, 0.55), rgba(20, 16, 14, 0));
+}
+
+.header__brand img {
+  height: 30px;
+  width: auto;
+}
+
+.header__nav {
+  display: flex;
+  gap: 26px;
+  margin-left: auto;
+}
+
+.header__nav button {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(248, 246, 241, 0.82);
+  transition: color 160ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .header__nav button:hover {
+    color: var(--c-white);
+  }
+}
+
+.header__progress {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 2px;
+  background: rgba(248, 246, 241, 0.1);
+}
+
+.header__progress span {
+  display: block;
+  height: 100%;
+  background: var(--c-gold);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+@media (max-width: 760px) {
+  .header__nav {
+    display: none;
+  }
+  .header .btn {
+    margin-left: auto;
+  }
+  .header__brand img {
+    height: 26px;
+  }
+}
+
+/* Footer */
+.footer {
+  position: relative;
+  z-index: 2;
+  padding: 72px var(--gutter) 40px;
+  background: var(--c-ink);
+  border-top: 1px solid var(--glass-line);
+}
+
+.footer__inner {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr auto;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer__brand p {
+  margin: 14px 0 0;
+  color: rgba(248, 246, 241, 0.6);
+  font-size: 14px;
+}
+
+.footer__contact {
+  display: grid;
+  gap: 6px;
+  font-style: normal;
+  font-size: 14px;
+  color: rgba(248, 246, 241, 0.78);
+}
+
+.footer__contact a,
+.footer__social a {
+  text-decoration: none;
+}
+
+.footer__social {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .footer a:hover {
+    color: var(--c-gold-hover);
+  }
+}
+
+.footer__note--credits {
+  margin-top: 8px !important;
+}
+
+.footer__note {
+  max-width: 1200px;
+  margin: 56px auto 0;
+  font-size: 12px;
+  color: rgba(248, 246, 241, 0.42);
+}
+
+@media (max-width: 760px) {
+  .footer__inner {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+}

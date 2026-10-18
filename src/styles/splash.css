@@ -1,0 +1,365 @@
+/* ---------- Splash: ReMo's mark, assembled ----------
+ * Base rules are the FINISHED state. While `.is-build` is on, keyframes play
+ * the assembly (fill-mode both = start from the "before" pose); dropping the
+ * class — when the build ends or the visitor skips — leaves the finished mark.
+ * --u is one pixel of the 700 × 190 wordmark file at the displayed size.
+ */
+
+html.is-splash {
+  overflow: hidden;
+}
+
+.splash {
+  --u: calc(min(680px, 84vw) / 700);
+  --ink: var(--c-ink, #28211e);
+  --gold: var(--c-gold, #c99b41);
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  cursor: default;
+}
+
+.splash__door {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50.5%;
+  overflow: hidden;
+  background: var(--ink);
+  transition: transform 850ms cubic-bezier(0.76, 0, 0.24, 1) 180ms;
+}
+
+.splash__door--top {
+  top: 0;
+}
+
+.splash__door--bottom {
+  bottom: 0;
+}
+
+/* A faint warm glow behind the mark so the ink isn't flat. */
+.splash__door--top::after,
+.splash__door--bottom::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  width: 120vmax;
+  height: 120vmax;
+  translate: -50% 0;
+  background: radial-gradient(closest-side, rgba(201, 155, 65, 0.1), transparent 70%);
+  pointer-events: none;
+}
+
+.splash__door--top::after {
+  bottom: -60vmax;
+}
+
+.splash__door--bottom::after {
+  top: -60vmax;
+}
+
+.splash__center {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: calc(34 * var(--u));
+  transition:
+    opacity 380ms ease,
+    transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.splash__logo {
+  position: relative;
+  width: calc(700 * var(--u));
+  height: calc(190 * var(--u));
+}
+
+.splash__piece {
+  position: absolute;
+  background-image: var(--logo);
+  background-size: calc(700 * var(--u)) calc(190 * var(--u));
+  background-repeat: no-repeat;
+}
+
+/* The name's reveal window. */
+.splash__wipe {
+  position: absolute;
+  top: 0;
+  height: calc(190 * var(--u));
+  overflow: hidden;
+}
+
+/* The square frame: four bars, drawn clockwise. */
+.splash__bar {
+  position: absolute;
+  background: #fff;
+}
+
+.splash__bar--top {
+  left: 0;
+  top: calc(2 * var(--u));
+  width: calc(187 * var(--u));
+  height: calc(7 * var(--u));
+  transform-origin: left center;
+}
+
+.splash__bar--right {
+  left: calc(180 * var(--u));
+  top: calc(2 * var(--u));
+  width: calc(7 * var(--u));
+  height: calc(187 * var(--u));
+  transform-origin: center top;
+}
+
+.splash__bar--bottom {
+  left: 0;
+  top: calc(182 * var(--u));
+  width: calc(187 * var(--u));
+  height: calc(7 * var(--u));
+  transform-origin: right center;
+}
+
+.splash__bar--left {
+  left: 0;
+  top: calc(2 * var(--u));
+  width: calc(7 * var(--u));
+  height: calc(187 * var(--u));
+  transform-origin: center bottom;
+}
+
+/* The four letter "modules" and where each one arrives from. */
+.splash__letter--left {
+  --dx: calc(-230 * var(--u));
+  --dy: 0px;
+}
+
+.splash__letter--top {
+  --dx: 0px;
+  --dy: calc(-200 * var(--u));
+}
+
+.splash__letter--bottom {
+  --dx: 0px;
+  --dy: calc(200 * var(--u));
+}
+
+.splash__letter--right {
+  --dx: calc(230 * var(--u));
+  --dy: 0px;
+}
+
+/* Gold seams where the modules meet; only visible as a flash. */
+.splash__seam {
+  position: absolute;
+  background: var(--gold);
+  opacity: 0;
+}
+
+.splash__seam--h {
+  left: calc(7 * var(--u));
+  top: calc(97 * var(--u));
+  width: calc(173 * var(--u));
+  height: calc(2.5 * var(--u));
+}
+
+.splash__seam--v {
+  left: calc(97 * var(--u));
+  top: calc(9 * var(--u));
+  width: calc(2.5 * var(--u));
+  height: calc(173 * var(--u));
+}
+
+.splash__tag {
+  margin: 0;
+  font-family: var(--f-display);
+  font-size: clamp(10px, 1.05vw, 13px);
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(248, 246, 241, 0.6);
+  text-align: center;
+}
+
+/* Only appears if the world is still loading after the mark is built. */
+.splash__loading {
+  position: relative;
+  width: 120px;
+  height: 1px;
+  overflow: hidden;
+  background: rgba(248, 246, 241, 0.12);
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.splash__loading.is-on {
+  opacity: 1;
+}
+
+.splash__loading::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: var(--gold);
+  animation: splash-loading 1.1s ease-in-out infinite;
+}
+
+/* ---------- Assembly timeline ---------- */
+
+.is-build .splash__bar--top,
+.is-build .splash__bar--bottom {
+  animation: splash-draw-x 420ms cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+.is-build .splash__bar--right,
+.is-build .splash__bar--left {
+  animation: splash-draw-y 420ms cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+.is-build .splash__bar--top {
+  animation-delay: 200ms;
+}
+
+.is-build .splash__bar--right {
+  animation-delay: 420ms;
+}
+
+.is-build .splash__bar--bottom {
+  animation-delay: 640ms;
+}
+
+.is-build .splash__bar--left {
+  animation-delay: 860ms;
+}
+
+.is-build .splash__letter {
+  animation: splash-module 760ms cubic-bezier(0.2, 1.25, 0.4, 1) both;
+  animation-delay: calc(1050ms + var(--i) * 130ms);
+}
+
+.is-build .splash__seam {
+  animation: splash-seam 700ms ease-out 1820ms both;
+}
+
+.is-build .splash__logo {
+  animation: splash-slide 950ms cubic-bezier(0.65, 0, 0.25, 1) 2150ms both;
+}
+
+.is-build .splash__wipe {
+  animation: splash-wipe-window 1000ms cubic-bezier(0.65, 0, 0.25, 1) 2250ms both;
+}
+
+.is-build .splash__name {
+  animation: splash-wipe-text 1000ms cubic-bezier(0.65, 0, 0.25, 1) 2250ms both;
+}
+
+.is-build .splash__tag {
+  animation: splash-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) 2850ms both;
+}
+
+/* ---------- Open: the doors part onto the clouds ---------- */
+
+.is-open {
+  pointer-events: none;
+}
+
+.is-open .splash__center {
+  opacity: 0;
+  transform: scale(1.06);
+}
+
+.is-open .splash__door--top {
+  transform: translateY(-101%);
+}
+
+.is-open .splash__door--bottom {
+  transform: translateY(101%);
+}
+
+/* Reduced motion: finished mark, then a plain fade. */
+.is-reduced .splash__door {
+  transition: opacity 400ms ease;
+}
+
+.is-reduced.is-open .splash__door {
+  transform: none;
+  opacity: 0;
+}
+
+.is-reduced.is-open .splash__center {
+  transform: none;
+}
+
+@keyframes splash-draw-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes splash-draw-y {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes splash-module {
+  from {
+    transform: translate(var(--dx), var(--dy));
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+}
+
+@keyframes splash-seam {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  30% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+/* Pre-slide, the logo sits so the square mark is dead centre. */
+@keyframes splash-slide {
+  from {
+    transform: translateX(calc(257 * var(--u)));
+  }
+}
+
+@keyframes splash-wipe-window {
+  from {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes splash-wipe-text {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes splash-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes splash-loading {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}

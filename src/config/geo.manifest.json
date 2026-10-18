@@ -1,0 +1,60 @@
+{
+  "lot": {
+    "lat": 34.18937,
+    "lon": -118.11519,
+    "place": "Altadena, California"
+  },
+  "layers": {
+    "near": {
+      "half": 300,
+      "image": "near.jpg"
+    },
+    "mid": {
+      "half": 2500,
+      "image": "mid.jpg"
+    },
+    "far": {
+      "half": 15000,
+      "image": "far.jpg"
+    }
+  },
+  "terrain": {
+    "file": "terrain.bin",
+    "half": 15000,
+    "grid": 385,
+    "lotElevation": 413,
+    "min": -348.3150544616201,
+    "max": 1592.896970066648
+  },
+  "sky": {
+    "image": "sky.jpg",
+    "vMax": 0.5833333333333334,
+    "sunU": 0.5791015625,
+    "sunV": 0.423828125,
+    "zenith": [
+      0.3407,
+      0.4494,
+      0.5929
+    ],
+    "upper": [
+      0.5659,
+      0.6603,
+      0.7582
+    ],
+    "horizon": [
+      0.6439,
+      0.6235,
+      0.6037
+    ],
+    "credit": "Kloppenheim 06 (Pure Sky) by Greg Zaal & Jarod Guest, Poly Haven, CC0"
+  },
+  "noise": {
+    "file": "noise3d.bin",
+    "size": 64
+  },
+  "credits": [
+    "Aerial imagery: USDA NAIP via USGS The National Map (public domain)",
+    "Elevation: AWS Terrain Tiles (USGS 3DEP, SRTM)",
+    "Sky and material textures: Poly Haven, CC0"
+  ]
+}
