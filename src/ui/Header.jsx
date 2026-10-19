@@ -4,6 +4,7 @@ import { MEDIA } from '../config/media.js'
 import { CHAPTERS } from '../config/chapters.config.js'
 import { journey } from '../scroll/journey.js'
 import { useJourney } from '../scroll/JourneyProvider.jsx'
+import { openStudio } from '../studio/studioState.js'
 
 const chapterIndex = (id) => CHAPTERS.findIndex((c) => c.id === id)
 
@@ -38,7 +39,14 @@ export function Header() {
         </button>
       </nav>
 
-      <a className="btn btn--gold btn--sm" href={COMPANY.factoryTourUrl} target="_blank" rel="noreferrer">
+      <button type="button" className="btn btn--gold btn--sm header__design" onClick={openStudio}>
+        <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+          <path d="M8 1.5 9.6 6.4 14.5 8 9.6 9.6 8 14.5 6.4 9.6 1.5 8 6.4 6.4Z" fill="currentColor" />
+        </svg>
+        Design yours
+      </button>
+
+      <a className="btn btn--ghost btn--sm header__tour" href={COMPANY.factoryTourUrl} target="_blank" rel="noreferrer">
         Factory tour
       </a>
 

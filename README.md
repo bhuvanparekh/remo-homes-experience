@@ -108,6 +108,33 @@ The mini-plan (bottom right) shows where you are and which way you face;
 click a room to go there. Toggles: **X-ray steel frame** (chapters 04–05) and
 **ReMo renders**. Indoors the lens widens to ~24 mm like ReMo's renders.
 
+## "Design yours" studio
+
+The gold **Design yours** button (or `#design` on the URL) opens a full-screen
+studio, lazy-loaded so the main journey never pays for it; the journey canvas
+pauses while it's open. The visitor sets lot size, street side, bedrooms,
+baths, extras and an interior style, then steps through:
+
+1. **Massing** — `studio/generator.js` lays out a SupReMo-style two-band plan
+   (sleeping wing · great room · primary suite) and fits it inside typical LA
+   setbacks, turning it 90° on narrow lots. Room blocks rise, coloured by use.
+2. **House** — `studio/houseModel.js` turns the rooms into walls, doors and
+   windows in the same format as `config/floorplan.js`, so the main site's
+   `Shell` wall code builds it; roof, solar, decks and canopies follow.
+3. **Interior** — the roof lifts off and `studio/furniture.jsx` furnishes every
+   room around its door and windows. `studio/styles.js` re-tints the shared
+   materials for the three looks.
+4. **Walk through** — `studio/tour.js` plans a route from the porch, in at
+   the front door and room to room through real doorways (a depth-first walk
+   of doors + open-plan edges, so no leg crosses a wall), with a view per
+   room. `TourCamera.jsx` walks it; `TourHud.jsx` has the room card,
+   play/pause/next, a clickable mini-plan and a closing card.
+
+A design can be shared as a link: `#design?w=50&d=120&street=south&bed=3&bath=2&x=0111&style=signature`
+(`x` = office, laundry, front porch, back deck).
+
+It is labelled as a concept sketch, never a ReMo plan, price or approval.
+
 ## Where things live
 
 ```

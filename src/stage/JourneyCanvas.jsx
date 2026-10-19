@@ -2,6 +2,8 @@ import { Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { ACESFilmicToneMapping, SRGBColorSpace } from 'three'
 import { QUALITY } from '../core/quality.js'
+import { useStoreValue } from '../core/store.js'
+import { selectOpen, studio } from '../studio/studioState.js'
 import { CameraRig } from './CameraRig.jsx'
 import { TourTracker } from './TourTracker.jsx'
 import { World } from './world/World.jsx'
@@ -13,8 +15,11 @@ import { World } from './world/World.jsx'
  * plane with altitude so depth precision stays tight inside the house.
  */
 export default function JourneyCanvas({ onReady }) {
+  // Paused while the "Design yours" studio has the screen.
+  const studioOpen = useStoreValue(studio, selectOpen)
   return (
     <Canvas
+      frameloop={studioOpen ? 'never' : 'always'}
       dpr={QUALITY.dpr}
       shadows={QUALITY.shadows ? 'percentage' : false}
       camera={{ fov: 42, near: 0.05, far: 40000, position: [-400, 1650, 2600] }}

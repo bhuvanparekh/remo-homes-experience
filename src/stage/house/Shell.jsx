@@ -13,7 +13,7 @@ const PANEL_BASE = 0.12
  * One wall: solid pieces around its openings, plus the fittings in each
  * opening. Exterior walls get the panel finish on their outside face only.
  */
-function Wall({ wall, exterior }) {
+export function Wall({ wall, exterior }) {
   const m = useMaterials()
   const t = exterior ? extWall : intWall
   const seg = segment(wall.a, wall.b)

@@ -170,12 +170,30 @@ a {
   transform-origin: left;
 }
 
+.header__design {
+  gap: 7px;
+  margin-right: -14px;
+}
+
 @media (max-width: 760px) {
   .header__nav {
     display: none;
   }
-  .header .btn {
-    margin-left: auto;
+  .header {
+    gap: 10px;
+  }
+  .header__design {
+    margin: 0 0 0 auto;
+  }
+  .header__tour {
+    padding: 0 14px;
+  }
+}
+
+/* Phones: the studio button takes the slot; the factory tour is in the last chapter. */
+@media (max-width: 520px) {
+  .header__tour {
+    display: none;
   }
   .header__brand img {
     height: 26px;

@@ -3,6 +3,7 @@ import { Footer } from './sections/Footer.jsx'
 import { Stage } from './stage/Stage.jsx'
 import { Header } from './ui/Header.jsx'
 import { Splash } from './ui/Splash.jsx'
+import { StudioRoot } from './studio/StudioRoot.jsx'
 import { JourneyProvider, useJourney } from './scroll/JourneyProvider.jsx'
 
 /**
@@ -27,6 +28,7 @@ export default function App() {
         <Journey />
       </main>
       <Footer />
+      <StudioRoot />
     </JourneyProvider>
   )
 }
