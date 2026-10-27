@@ -1972,3 +1972,306 @@ html.is-zonelab {
     white-space: nowrap;
   }
 }
+
+/* ---------- Opportunity map ---------- */
+
+.zo-cta {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  margin-top: 4px;
+  padding: 12px 14px;
+  border: 1px solid rgba(201, 155, 65, 0.5);
+  border-radius: 12px;
+  background: rgba(201, 155, 65, 0.1);
+  text-align: left;
+}
+
+.zo-cta b {
+  color: var(--c-gold-hover);
+  font-family: var(--f-display);
+}
+
+.zo-cta small {
+  color: var(--z-dim);
+  font-size: 12px;
+}
+
+.zo {
+  margin-bottom: 14px;
+}
+
+.zo__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.zo__lede {
+  margin: 8px 0 12px;
+  font-size: 13px;
+  color: var(--z-dim);
+}
+
+.zo-notice {
+  margin: 0 0 12px;
+  padding: 8px 10px;
+  border-left: 3px solid #f0954a;
+  border-radius: 4px;
+  background: rgba(240, 149, 74, 0.1);
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--z-dim);
+}
+
+.zo-notice b {
+  color: #f0954a;
+}
+
+.zo-places {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.zo-places button {
+  min-height: 30px;
+  padding: 0 11px;
+  border-radius: 999px;
+  border: 1px solid var(--z-line);
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(248, 246, 241, 0.82);
+}
+
+.zo-kinds {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.zo-kinds button {
+  display: grid;
+  grid-template-columns: 14px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 9px;
+  font-size: 13px;
+  text-align: left;
+  opacity: 0.5;
+  transition: opacity 160ms var(--ease-out), background-color 160ms var(--ease-out);
+}
+
+.zo-kinds button.is-on {
+  opacity: 1;
+  background: rgba(248, 246, 241, 0.05);
+}
+
+.zo-kinds i,
+.zo-list i,
+.zo-card__kind i {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1.5px #1c1715;
+}
+
+.zo-kinds b {
+  font-family: var(--f-display);
+  font-size: 12.5px;
+}
+
+.zo-filters {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.zo-seg {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.zo-seg > span {
+  min-width: 88px;
+  color: var(--z-dim);
+}
+
+.zo-seg button {
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid var(--z-line);
+  font-weight: 600;
+  color: rgba(248, 246, 241, 0.75);
+}
+
+.zo-seg button.is-on {
+  border-color: var(--c-gold);
+  background: rgba(201, 155, 65, 0.18);
+  color: var(--c-cream);
+}
+
+.zo-status {
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(248, 246, 241, 0.05);
+  font-size: 13px;
+}
+
+.zo-status p {
+  margin: 4px 0 0;
+}
+
+.zo-listhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: var(--z-dim);
+}
+
+.zo-listhead p {
+  margin: 0;
+}
+
+.zo-list {
+  display: grid;
+  gap: 2px;
+  max-height: 340px;
+  margin: 0 0 12px;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.zo-list button {
+  display: grid;
+  grid-template-columns: 12px 1fr;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 8px;
+  border-radius: 8px;
+  text-align: left;
+  font-size: 13px;
+}
+
+.zo-list button.is-on {
+  background: rgba(201, 155, 65, 0.16);
+}
+
+.zo-list span {
+  display: grid;
+}
+
+.zo-list small {
+  font-size: 11.5px;
+  color: var(--z-dim);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .zo-list button:hover,
+  .zo-places button:hover {
+    background: rgba(248, 246, 241, 0.07);
+  }
+}
+
+/* Card for a tapped marker */
+.zo-card {
+  position: absolute;
+  left: 18px;
+  bottom: 18px;
+  z-index: 5;
+  width: min(340px, calc(100% - 36px));
+  padding: 16px 16px 14px;
+  border-radius: 14px;
+  background: rgba(28, 23, 21, 0.94);
+  color: var(--c-cream);
+  box-shadow: 0 14px 40px rgba(20, 16, 14, 0.35);
+  font-size: 13px;
+}
+
+.zo-card__x {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: var(--z-dim);
+}
+
+.zo-card__kind {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--z-dim);
+}
+
+.zo-card h3 {
+  margin: 0;
+  padding-right: 26px;
+  font-family: var(--f-display);
+  font-size: 16px;
+}
+
+.zo-card__title {
+  margin: 2px 0 8px;
+  color: rgba(248, 246, 241, 0.78);
+}
+
+.zo-card dl {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  justify-content: start;
+  gap: 4px 18px;
+  margin: 0 0 8px;
+}
+
+.zo-card dt {
+  font-size: 11px;
+  color: var(--z-dim);
+}
+
+.zo-card dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.zo-card__detail {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: rgba(248, 246, 241, 0.7);
+}
+
+.zo-card__src {
+  margin: 0 0 10px;
+  font-size: 11px;
+  color: var(--z-dim);
+}
+
+@media (max-width: 760px) {
+  .zo-card {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    width: auto;
+  }
+  .zo-list {
+    max-height: none;
+  }
+}

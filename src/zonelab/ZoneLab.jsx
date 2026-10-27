@@ -11,6 +11,8 @@ import { lotSlope } from './rules/slope.js'
 import { defaultFilters, designOptions } from './design/generate.js'
 import { planFloor } from './design/floorPlans.js'
 import { streetPresets, walkKeys } from './site/StreetScene.jsx'
+import { KINDS, loadOpportunities } from './opportunity/load.js'
+import { OppCard, OpportunityPanel, SINCE } from './opportunity/OpportunityPanel.jsx'
 import { closeZoneLab, setZoneLabLot, zoneLab } from './zoneLabState.js'
 import '../styles/zonelab.css'
 
@@ -124,6 +126,69 @@ export default function ZoneLab() {
 
   const pickPoint = useCallback(([lng, lat]) => run((o) => lookupAt(lng, lat, o), [lng, lat]), [run])
   const pickApn = useCallback((apn) => run((o) => lookupApn(apn, o)), [run])
+
+  /* ---------- Opportunity map ---------- */
+  const [oppOn, setOppOn] = useState(false)
+  const [oppFilters, setOppFilters] = useState(() => ({
+    kinds: Object.fromEntries(Object.keys(KINDS).map((k) => [k, true])),
+    since: '6m',
+    lotType: 'all',
+  }))
+  const [oppRaw, setOppRaw] = useState({ items: [], notes: [], loading: false })
+  const [oppSel, setOppSel] = useState(null)
+  const oppView = useRef(null)
+  const oppAbort = useRef(null)
+  const oppTimer = useRef(0)
+
+  const loadOpp = useCallback(() => {
+    const v = oppView.current
+    if (!v) return
+    clearTimeout(oppTimer.current)
+    oppTimer.current = setTimeout(async () => {
+      oppAbort.current?.abort()
+      const ctrl = new AbortController()
+      oppAbort.current = ctrl
+      setOppRaw((r) => ({ ...r, loading: true }))
+      try {
+        const since = SINCE.find((x) => x.id === oppFilters.since).value()
+        const res = await loadOpportunities(v.bbox, v.zoom, { kinds: oppFilters.kinds, since }, { signal: ctrl.signal })
+        if (!ctrl.signal.aborted) setOppRaw({ ...res, loading: false })
+      } catch {
+        if (!ctrl.signal.aborted) setOppRaw((r) => ({ ...r, loading: false, notes: ['Couldn’t load this area — try again'] }))
+      }
+    }, 280)
+  }, [oppFilters.kinds, oppFilters.since])
+
+  const onView = useCallback(
+    (bbox, zoom) => {
+      oppView.current = { bbox, zoom }
+      if (oppOn) loadOpp()
+    },
+    [oppOn, loadOpp],
+  )
+  useEffect(() => {
+    if (!oppOn) {
+      oppAbort.current?.abort()
+      setOppRaw({ items: [], notes: [], loading: false })
+      setOppSel(null)
+      return
+    }
+    oppView.current = mapRef.current?.view() || oppView.current
+    loadOpp()
+  }, [oppOn, loadOpp])
+
+  const oppItems = useMemo(
+    () => (oppFilters.lotType === 'all' ? oppRaw.items : oppRaw.items.filter((i) => i.lotType === oppFilters.lotType)),
+    [oppRaw.items, oppFilters.lotType],
+  )
+  useEffect(() => {
+    mapRef.current?.setOpportunities(oppOn ? oppItems.map((i) => ({ id: i.id, lng: i.lng, lat: i.lat, color: KINDS[i.kind].color, sel: i.id === oppSel })) : [])
+  }, [oppOn, oppItems, oppSel])
+  const oppItem = oppItems.find((i) => i.id === oppSel) || null
+  const selectOpp = (item, fly) => {
+    setOppSel(item.id)
+    if (fly) mapRef.current?.flyTo([item.lng, item.lat], Math.max(16, oppView.current?.zoom || 16))
+  }
 
   const clear = () => {
     lookupAbort.current?.abort()
@@ -254,10 +319,24 @@ export default function ZoneLab() {
   return (
     <div className={`zl ${report ? 'has-report' : ''} is-${mode}`} role="dialog" aria-modal="true" aria-labelledby="zl-title" data-lenis-prevent>
       <div className="zl__view">
-        <LotMap ref={mapRef} onPick={pickPoint} zoningOn={zoningOn} onZoningState={setZoningState} />
+        <LotMap
+          ref={mapRef}
+          onPick={pickPoint}
+          zoningOn={zoningOn}
+          onZoningState={setZoningState}
+          onView={onView}
+          onOppPick={(id) => setOppSel(id)}
+        />
+        {oppOn && !in3d && oppItem && (
+          <OppCard item={oppItem} onClose={() => setOppSel(null)} onOpen={() => pickPoint([oppItem.lng, oppItem.lat])} />
+        )}
 
         {!in3d && (
           <div className="zl-key">
+            <button type="button" className={`zl-toggle ${oppOn ? 'is-on' : ''}`} aria-pressed={oppOn} onClick={() => setOppOn((v) => !v)}>
+              <span className="zl-toggle__sw" aria-hidden="true" />
+              Opportunity map
+            </button>
             <button type="button" className={`zl-toggle ${zoningOn ? 'is-on' : ''}`} aria-pressed={zoningOn} onClick={() => setZoningOn((v) => !v)}>
               <span className="zl-toggle__sw" aria-hidden="true" />
               Zoning colours
@@ -393,7 +472,18 @@ export default function ZoneLab() {
       </div>
 
       <aside className="zl__panel">
-        {!report && (
+        {oppOn && !report && (
+          <OpportunityPanel
+            filters={oppFilters}
+            setFilters={setOppFilters}
+            result={{ ...oppRaw, items: oppItems }}
+            selected={oppSel}
+            onSelect={selectOpp}
+            onPlace={(p) => mapRef.current?.flyTo(p.center, p.zoom)}
+            onClose={() => setOppOn(false)}
+          />
+        )}
+        {!report && !oppOn && (
           <div className="zl-intro">
             <p className="eyebrow">Zone Lab · City of Los Angeles</p>
             <h2 id="zl-title" className="zl__title">
@@ -403,6 +493,10 @@ export default function ZoneLab() {
               Search an address or tap any lot on the map. We read the City’s zoning and the County’s records live, the moment
               you ask.
             </p>
+            <button type="button" className="zo-cta" onClick={() => setOppOn(true)}>
+              <b>Opportunity map →</b>
+              <small>Burned, cleared, empty and newly permitted lots across LA, live</small>
+            </button>
           </div>
         )}
         {report && (
@@ -419,7 +513,7 @@ export default function ZoneLab() {
           </p>
         )}
 
-        {!report && (
+        {!report && !oppOn && (
           <div className="zl-samples">
             <p>Or try a lot:</p>
             <ul>

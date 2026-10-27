@@ -74,6 +74,7 @@ function style() {
       zoning: { type: 'geojson', data: EMPTY, attribution: 'Zoning © City of Los Angeles' },
       lot: { type: 'geojson', data: EMPTY },
       ping: { type: 'geojson', data: EMPTY },
+      opp: { type: 'geojson', data: EMPTY, cluster: true, clusterRadius: 30, clusterMaxZoom: 14.5, attribution: 'Fire recovery © LA County · Permits © City of LA' },
     },
     layers: [
       { id: 'bg', type: 'background', paint: { 'background-color': '#1c1715' } },
@@ -142,6 +143,38 @@ function style() {
       },
       { id: 'lot-line', type: 'line', source: 'lot', paint: { 'line-color': '#ffd27a', 'line-width': 2.6 } },
       {
+        id: 'opp-cluster',
+        type: 'circle',
+        source: 'opp',
+        filter: ['has', 'point_count'],
+        paint: {
+          'circle-color': 'rgba(28,23,21,0.82)',
+          'circle-stroke-color': '#ddb75f',
+          'circle-stroke-width': 2,
+          'circle-radius': ['step', ['get', 'point_count'], 15, 50, 20, 300, 26, 1500, 32],
+        },
+      },
+      {
+        id: 'opp-count',
+        type: 'symbol',
+        source: 'opp',
+        filter: ['has', 'point_count'],
+        layout: { 'text-field': ['get', 'point_count_abbreviated'], 'text-font': FONT_BOLD, 'text-size': 12, 'text-allow-overlap': true },
+        paint: { 'text-color': '#f8f6f1' },
+      },
+      {
+        id: 'opp-point',
+        type: 'circle',
+        source: 'opp',
+        filter: ['!', ['has', 'point_count']],
+        paint: {
+          'circle-color': ['get', 'color'],
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 12, 4, 16, 7, 19, 10],
+          'circle-stroke-color': ['case', ['boolean', ['get', 'sel'], false], '#ffffff', '#1c1715'],
+          'circle-stroke-width': ['case', ['boolean', ['get', 'sel'], false], 3, 1.2],
+        },
+      },
+      {
         id: 'ping',
         type: 'circle',
         source: 'ping',
@@ -163,7 +196,7 @@ const ZONING_MIN_ZOOM = 14
  * Ref API: showLot(ring), clearLot(), ping([lng, lat]), flyToLot(ring, padding),
  * flyHome(), map (the MapLibre instance).
  */
-export const LotMap = forwardRef(function LotMap({ onPick, zoningOn = true, onZoningState }, ref) {
+export const LotMap = forwardRef(function LotMap({ onPick, zoningOn = true, onZoningState, onOppPick, onView }, ref) {
   const el = useRef(null)
   const map = useRef(null)
   const zoningAbort = useRef(null)
@@ -171,6 +204,10 @@ export const LotMap = forwardRef(function LotMap({ onPick, zoningOn = true, onZo
   const zoningRef = useRef(zoningOn)
   const stateRef = useRef(onZoningState)
   pickRef.current = onPick
+  const oppPickRef = useRef(onOppPick)
+  oppPickRef.current = onOppPick
+  const viewRef = useRef(onView)
+  viewRef.current = onView
   stateRef.current = onZoningState
 
   useEffect(() => {
@@ -193,7 +230,33 @@ export const LotMap = forwardRef(function LotMap({ onPick, zoningOn = true, onZo
     m.once('load', () => m.getContainer().querySelector('.maplibregl-compact-show')?.classList.remove('maplibregl-compact-show'))
     m.getCanvas().style.cursor = 'crosshair'
 
-    m.on('click', (e) => pickRef.current?.([e.lngLat.lng, e.lngLat.lat]))
+    m.on('click', (e) => {
+      const hit = m.getLayer('opp-point')
+        ? m.queryRenderedFeatures(e.point, { layers: ['opp-cluster', 'opp-point'] })[0]
+        : null
+      if (hit?.properties?.cluster) {
+        m.getSource('opp')
+          .getClusterExpansionZoom(hit.properties.cluster_id)
+          .then((z) => m.easeTo({ center: hit.geometry.coordinates, zoom: z + 0.3 }))
+        return
+      }
+      if (hit) {
+        oppPickRef.current?.(hit.properties.id, hit.geometry.coordinates)
+        return
+      }
+      pickRef.current?.([e.lngLat.lng, e.lngLat.lat])
+    })
+    for (const id of ['opp-cluster', 'opp-point']) {
+      m.on('mouseenter', id, () => (m.getCanvas().style.cursor = 'pointer'))
+      m.on('mouseleave', id, () => (m.getCanvas().style.cursor = 'crosshair'))
+    }
+    // Tell the page what's on screen (for loading the opportunity layers).
+    const report = () => {
+      const b = m.getBounds()
+      viewRef.current?.([b.getWest(), b.getSouth(), b.getEast(), b.getNorth()], m.getZoom())
+    }
+    m.on('moveend', report)
+    m.on('load', report)
 
     // City zoning for what's on screen, straight from City Planning's layer.
     const loadZoning = async () => {
@@ -279,6 +342,26 @@ export const LotMap = forwardRef(function LotMap({ onPick, zoningOn = true, onZo
     },
     flyHome() {
       map.current?.flyTo({ ...LA_VIEW, duration: 1600 })
+    },
+    /** Opportunity markers: [{ id, lng, lat, color, sel }]. */
+    setOpportunities(items) {
+      map.current?.getSource('opp')?.setData({
+        type: 'FeatureCollection',
+        features: items.map((i) => ({
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: [i.lng, i.lat] },
+          properties: { id: i.id, color: i.color, sel: Boolean(i.sel) },
+        })),
+      })
+    },
+    flyTo(center, zoom) {
+      map.current?.flyTo({ center, zoom, pitch: 30, duration: 1400, essential: true })
+    },
+    view() {
+      const m = map.current
+      if (!m) return null
+      const b = m.getBounds()
+      return { bbox: [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()], zoom: m.getZoom() }
     },
   }))
 
