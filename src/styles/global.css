@@ -170,7 +170,8 @@ a {
   transform-origin: left;
 }
 
-.header__design {
+.header__design,
+.header__zone {
   gap: 7px;
   margin-right: -14px;
 }
@@ -185,6 +186,9 @@ a {
   .header__design {
     margin: 0 0 0 auto;
   }
+  .header__zone {
+    margin-right: 0;
+  }
   .header__tour {
     padding: 0 14px;
   }
@@ -194,6 +198,13 @@ a {
 @media (max-width: 520px) {
   .header__tour {
     display: none;
+  }
+  .header__long {
+    display: none;
+  }
+  .header__design,
+  .header__zone {
+    padding: 0 13px;
   }
   .header__brand img {
     height: 26px;

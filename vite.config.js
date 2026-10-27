@@ -14,14 +14,16 @@ export default defineConfig({
   plugins: [react()],
   server: { open: true },
   build: {
-    // three.js is ~700 kB minified and is lazy-loaded behind the stage.
-    chunkSizeWarningLimit: 1000,
+    // three.js (~750 kB) and MapLibre (~1 MB) are both lazy-loaded.
+    chunkSizeWarningLimit: 1100,
     rollupOptions: {
       output: {
         codeSplitting: {
           groups: [
             { name: 'three', test: /[\\/]node_modules[\\/]three[\\/]/ },
             { name: 'r3f', test: /[\\/]node_modules[\\/]@react-three[\\/]fiber[\\/]/ },
+            // The Zone Lab map (~1 MB), downloaded only when Zone Lab opens.
+            { name: 'maplibre', test: /[\\/]node_modules[\\/]maplibre-gl[\\/]/ },
           ],
         },
       },

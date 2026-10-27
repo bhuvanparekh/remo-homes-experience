@@ -4,6 +4,7 @@ import { Stage } from './stage/Stage.jsx'
 import { Header } from './ui/Header.jsx'
 import { Splash } from './ui/Splash.jsx'
 import { StudioRoot } from './studio/StudioRoot.jsx'
+import { ZoneLabRoot } from './zonelab/ZoneLabRoot.jsx'
 import { JourneyProvider, useJourney } from './scroll/JourneyProvider.jsx'
 
 /**
@@ -29,6 +30,7 @@ export default function App() {
       </main>
       <Footer />
       <StudioRoot />
+      <ZoneLabRoot />
     </JourneyProvider>
   )
 }
